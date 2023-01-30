@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                text-align:center;
+                background-color:white;
+            }
+            input,textarea  {
+                background-color:snow;
+                border:1px solid snow;
+                border-radius:5px;
+            }
+            .chats {
+                background-color:snow;
+                border-radius:5px;
+                width:400px;
+                border:0px solid blue;
+            }
+            .msg {
+                background-color:#01cf51;
+                border:0px solid blue;
+                color:white;
+                font-family:Arial;
+                font-size:19px;
+                border-radius:3px;
+                text-align:left;
+            }
+            .msgbot {
+                background-color:#0078ff;
+                border:0px solid white;
+                color:white;
+                font-family:Arial;
+                font-size:19px;
+                border-radius:3px;
+                text-align:left;
+            }
+            button {
+
+                border-radius:5px;
+                border:0px solid white;
+                cursor:pointer;
+            }
+            p{
+                color:black;
+                font-size:18px;
+                font-family:Arial;
+            }
+            #popup {
+                color:black;
+                background-color:snow;
+                font-family:Arial;
+                width:400px;
+                border-radius:5px;
+            }
+            a {
+font-family:Arial;
+                color:black;
+                
+            }
+        </style>
+        <script src = "https://infinity847.github.io/HRS-2.14/HRS.js"></script>
+        <script src = "https://database.timothygribov.repl.co/script.js"></script>
+        <title>AI BOT</title>
+    </head>
+<body>
+    <br><br><center>
+    <div id = "messages" class = "chats">
+        <br>
+        <p id = "time"></p>
+        <br>
+        <span class = "msgbot"style='float:left;margin-left:10px;'>Hello, how may I help you?</span><br><br>
+    </div>
+    </center><br>
+    <span>
+    <input id = "input">&nbsp;<button onclick = "ask()" style="background-color:#01cf51;color:snow;">Send</button>&nbsp;<button onclick = "popup()" style = "background-color:#0078ff;color:snow;">More</button></span>
+    <center>
+        <div id = "popup">
+<h2>Want to train this bot more?</h2>
+            <input placeholder = "User Input" id = "UI"><br>
+            <input placeholder = "Bot Output" id = "BO"><br><br>
+            <button onclick = "train()" style = "background-color:snow;">Add</button>
+            <br><br>
+            <label id = "samples">0</label>
+            <br><br>
+<h2>Train Bot With Multiple Responses</h2>
+            <input placeholder = "User Input" id = "MUI"><br>
+            <textarea placeholder = "Bot Output" id = "MBO"></textarea><br><br>
+            <button onclick = "multipletrain()" style = "background-color:snow;">Add</button><br><br>
+            <a href = "AI_APP.html" download="VoyagerBot">Click here to download to HTML format</a>
+            <br>
+        </div>
+    </center>
+
+    <script>
+        const input = document.getElementById("input");
+        const msg = document.getElementById("messages");
+        const timecount= document.getElementById("time");
+        const about = document.getElementById("popup");
+        const UI = document.getElementById("UI");
+        const BO = document.getElementById("BO");
+        const MUI = document.getElementById("MUI");
+        const MBO = document.getElementById("MBO");
+        const samples = document.getElementById("samples");
+        const api = $Import("ChatBot");
+        var webdata = {
+            loadeditems:0
+        }
+        while(webdata.loadeditems<database.info.utterances.length) {
+api.AddUtterance(database.info.utterances[webdata.loadeditems]);
+api.AddResponse(database.info.responses[webdata.loadeditems]);
+webdata.loadeditems++;
+        }
+webdata.loadeditems=0;
+while(webdata.loadeditems<database.info.alternatives.length) {
+    api.AddAlternative(database.info.alternatives[webdata.loadeditems])
+    webdata.loadeditems++;
+}
+        var time = new Date();
+if (time.getHours()>12) {
+    if (time.getMinutes()<10) {
+        timecount.innerHTML=`${parseInt(time.getHours())-12}:0${time.getMinutes()} PM`;
+    }else {
+        timecount.innerHTML=`${parseInt(time.getHours())-12}:${time.getMinutes()} PM`;
+    }
+}else {
+    if (time.getMinutes()<10) {
+        timecount.innerHTML=`${parseInt(time.getHours())}:0${time.getMinutes()} AM`;
+    }else {
+        timecount.innerHTML=`${parseInt(time.getHours())}:${time.getMinutes()} AM`;
+    }
+}
+function ask() {
+    if (input.value == undefined||input.value == "") {
+    alert("Please enter something in the input.");
+}else {      
+    let fixedstring = input.value.replaceAll(".","");
+     fixedstring = fixedstring.replaceAll("`","");//
+    fixedstring = fixedstring.replaceAll("'","");
+    fixedstring = fixedstring.replaceAll("*","");
+    fixedstring = fixedstring.replaceAll("&","");
+    fixedstring = fixedstring.replaceAll("%","");
+    fixedstring = fixedstring.replaceAll("$","");
+    fixedstring = fixedstring.replaceAll("#","");
+    fixedstring = fixedstring.replaceAll("@","");
+    fixedstring = fixedstring.replaceAll(",","");
+    fixedstring = fixedstring.replaceAll("'","");
+    fixedstring = fixedstring.replaceAll("!","");
+    fixedstring = fixedstring.replaceAll("?","");
+    fixedstring = fixedstring.replaceAll("(","");
+    fixedstring = fixedstring.replaceAll(")","");
+    fixedstring = fixedstring.replaceAll(";","");
+    fixedstring = fixedstring.replaceAll(":","");
+    fixedstring = fixedstring.replaceAll("~","");
+    fixedstring = fixedstring.replaceAll(" ","");
+    fixedstring = fixedstring.toLowerCase();
+        msg.innerHTML+=`<br><span class = 'msg'style='float:right;margin-right:10px;'>${input.value}</span><br>`;
+    
+    let result = api.GiveResult(fixedstring);
+    if (Array.isArray(result)) {
+        msg.innerHTML+=`<br><span class = 'msgbot'style='float:left;margin-left:10px;'>${result[Math.floor(Math.random()*result.length)]}</span><br><br>`;
+        input.value="";
+    }else if (typeof result === 'object' &&
+    !Array.isArray(result) &&
+    result !== null){
+        result.action();
+       msg.innerHTML+=`<br><span class = 'msgbot'style='float:left;margin-left:10px;'>${result.msg}</span><br><br>`;
+        input.value="";  
+    }else {
+        msg.innerHTML+=`<br><span class = 'msgbot'style='float:left;margin-left:10px;'>${result}</span><br><br>`;
+        input.value="";
+    }
+}
+
+}
+about.style.display="none";
+function popup() {
+if (about.style.display == "block") {
+    about.style.display="none";
+}else {
+    about.style.display="block";
+txt = database.info.utterances.length;
+    i=0;
+    samples.innerHTML="0";
+    typeWriter();
+}
+}
+        input.onkeydown = function(e) {
+            if (e.key=="Enter") {
+                ask();
+            }
+        }
+        function train() {
+            if (UI.value==""||BO.value=="") {
+                alert("Please put something in both of the inputs.");
+            }else {
+                i++;
+                 let fixedstring = UI.value.replaceAll(".","");
+     fixedstring = fixedstring.replaceAll("`","");//
+    fixedstring = fixedstring.replaceAll("'","");
+    fixedstring = fixedstring.replaceAll("*","");
+    fixedstring = fixedstring.replaceAll("&","");
+    fixedstring = fixedstring.replaceAll("%","");
+    fixedstring = fixedstring.replaceAll("$","");
+    fixedstring = fixedstring.replaceAll("#","");
+    fixedstring = fixedstring.replaceAll("@","");
+    fixedstring = fixedstring.replaceAll(",","");
+    fixedstring = fixedstring.replaceAll("'","");
+    fixedstring = fixedstring.replaceAll("!","");
+    fixedstring = fixedstring.replaceAll("?","");
+    fixedstring = fixedstring.replaceAll("(","");
+    fixedstring = fixedstring.replaceAll(")","");
+    fixedstring = fixedstring.replaceAll(";","");
+    fixedstring = fixedstring.replaceAll(":","");
+    fixedstring = fixedstring.replaceAll("~","");
+    fixedstring = fixedstring.replaceAll(" ","");
+    fixedstring = fixedstring.toLowerCase();
+                database.info.utterances.push(fixedstring);
+                database.info.responses.push(BO.value);
+api.AddUtterance(fixedstring);
+api.AddResponse(BO.value);
+                
+                samples.innerHTML = `<b>${i}</b> Samples In Database`;
+                UI.value="";BO.value="";
+            }
+        }
+        function multipletrain() {
+            if (MUI.value==""||MBO.value =="") {
+alert("Please enter something inside the inputs.");
+            }else {
+               i++;
+                 let fixedstring = MUI.value.replaceAll(".","");
+                let response = [];
+    fixedstring = fixedstring.replaceAll(",","");
+    fixedstring = fixedstring.replaceAll("`","");
+    fixedstring = fixedstring.replaceAll("'","");
+    fixedstring = fixedstring.replaceAll("*","");
+    fixedstring = fixedstring.replaceAll("&","");
+    fixedstring = fixedstring.replaceAll("%","");
+    fixedstring = fixedstring.replaceAll("$","");
+    fixedstring = fixedstring.replaceAll("#","");
+    fixedstring = fixedstring.replaceAll("@","");
+    fixedstring = fixedstring.replaceAll("!","");
+    fixedstring = fixedstring.replaceAll("?","");
+    fixedstring = fixedstring.replaceAll("(","");
+    fixedstring = fixedstring.replaceAll(")","");
+    fixedstring = fixedstring.replaceAll(";","");
+    fixedstring = fixedstring.replaceAll(":","");
+    fixedstring = fixedstring.replaceAll("~","");
+    fixedstring = fixedstring.replaceAll(" ","");
+    fixedstring = fixedstring.toLowerCase();
+                database.info.utterances.push(fixedstring);
+                api.AddUtterance(fixedstring);
+        let lines = MBO.value.split('\n');
+for(let i = 0;i < lines.length;i++){
+    response.push(lines[i]);
+}
+                database.info.responses.push(response);
+                api.AddResponse(response);
+                 samples.innerHTML = `<b>${i}</b> Samples In Database`;
+                MUI.value="";MBO.value="";
+            }
+        }
+        var i = 0;
+var txt = database.info.utterances.length;
+var speed = 0;
+
+function typeWriter() {
+  if (i < parseInt(txt)+1){
+    samples.innerHTML = `${i} Samples In Database`;
+    i++;
+    setTimeout(typeWriter, speed);
+  }else {
+      i--;
+      samples.innerHTML = `<b>${i}</b> Samples In Database`;
+  }
+}
+    </script>
+</body>
+</html>
